@@ -1,27 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react'
+import { io } from 'socket.io-client'
+import { api } from '../../services/api';
 import { Post } from '../Post';
 
 import { Container } from './styles';
+ 
+type Post = {
+  id: string;
+  message:string;
+  title: string;
+  urlImg: string;
+}
+
+const postsQueue: Post[] = []
+
+const socket = io('http://localhost:4000/')
+socket.on('new_message', (newMessage: Post) => {
+  postsQueue.push(newMessage);
+})
 
 export const PostList: React.FC = () => {
+  const [post, setPost] = useState<Post[]>([]);
+  useEffect(()=>{
+    setInterval(() => {
+      if (postsQueue.length > 0) {
+        setPost(postsQueue)
+      }
+    }, 3000)
+  }, [])
+
+  useEffect(()=>{
+    api.get<Post[]>('/getPost').then(response =>{
+      console.log(response.data)
+      setPost(response.data)
+    })
+
+  },[])
+
   return (
     <Container>
       <div className="container">
         <ul>
-          <Post 
-            image='https://github.com/matheuspython.png'
-            text='Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa dolore, totam velit commodi minima at voluptatum eum? Impedit atque, aspernatur asperiores consequuntur doloremque et perferendis tempora inventore molestias voluptatum non dolorem sint corrupti ad nostrum sapiente cupiditate, veritatis repellendus modi soluta odit nulla deleniti eveniet incidunt. Cum incidunt ducimus maxime eius hic culpa ipsum quis illum dolore sed doloribus distinctio autem laborum dignissimos, nemo, harum delectus doloremque excepturi deleniti id repellendus quod ut aut. Animi cupiditate odit sunt, dolor suscipit provident maiores consectetur velit adipisci tempore perspiciatis ad magnam earum saepe esse itaque nostrum molestiae tempora nam aliquam. Consectetur sapiente doloremque consequuntur officia est nihil sint assumenda! Quis consectetur inventore, numquam recusandae a odio quae. Doloribus quas libero labore odit qui dolorum omnis atque quod similique facilis voluptate quisquam modi magnam, excepturi deserunt debitis, repellendus cumque maiores voluptatibus esse accusantium molestiae. Vero libero corporis asperiores quidem sequi quia maiores praesentium. Dolores velit praesentium nam placeat officiis ut totam voluptatibus sit necessitatibus obcaecati atque est, rerum magnam, odit ex. Dolorem molestiae nihil, modi facilis, pariatur voluptatum eius ea quam rem architecto qui maxime amet! Vitae quis obcaecati quibusdam minus, delectus quidem.'
-            title='seila'
-          />
-                <Post 
-            image='https://github.com/matheuspython.png'
-            text='Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa dolore, totam velit commodi minima at voluptatum eum? Impedit atque, aspernatur asperiores consequuntur doloremque et perferendis tempora inventore molestias voluptatum non dolorem sint corrupti ad nostrum sapiente cupiditate, veritatis repellendus modi soluta odit nulla deleniti eveniet incidunt. Cum incidunt ducimus maxime eius hic culpa ipsum quis illum dolore sed doloribus distinctio autem laborum dignissimos, nemo, harum delectus doloremque excepturi deleniti id repellendus quod ut aut. Animi cupiditate odit sunt, dolor suscipit provident maiores consectetur velit adipisci tempore perspiciatis ad magnam earum saepe esse itaque nostrum molestiae tempora nam aliquam. Consectetur sapiente doloremque consequuntur officia est nihil sint assumenda! Quis consectetur inventore, numquam recusandae a odio quae. Doloribus quas libero labore odit qui dolorum omnis atque quod similique facilis voluptate quisquam modi magnam, excepturi deserunt debitis, repellendus cumque maiores voluptatibus esse accusantium molestiae. Vero libero corporis asperiores quidem sequi quia maiores praesentium. Dolores velit praesentium nam placeat officiis ut totam voluptatibus sit necessitatibus obcaecati atque est, rerum magnam, odit ex. Dolorem molestiae nihil, modi facilis, pariatur voluptatum eius ea quam rem architecto qui maxime amet! Vitae quis obcaecati quibusdam minus, delectus quidem.'
-            title='seila'
-          />
-          
-
+          {post.map(post => (
+             <Post 
+             image={post.urlImg}
+             text={post.message}
+             title={post.title}
+           />
+          ))}
         </ul>
-        
       </div>  
     </Container>
   )

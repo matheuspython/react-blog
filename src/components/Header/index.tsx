@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import Switch from 'react-switch'
+import { Link } from "react-router-dom";
 
 import { ThemeContext } from 'styled-components'
 import {shade} from 'polished'
@@ -41,9 +42,8 @@ export const Header: React.FC <Props> = ({toggleTheme}) => {
       <aside style={{display: menu ? 'block' : 'none'}}>
         <img onClick={changeMenuState} src="https://www.pinclipart.com/picdir/big/538-5385185_grey-cross-icon-png-clipart.png" alt="sair" />
         <ul>
-          <li><a href="">link 1</a></li>
-          <li><a href="">link 2</a></li>
-          <li><a href="">link 3</a></li>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/login">login</Link></li>
         </ul>
       </aside>
     </Container>
